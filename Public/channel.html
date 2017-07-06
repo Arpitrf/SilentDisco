@@ -1,0 +1,104 @@
+<html>
+	<head>
+			<script src="socket.io.js"></script>
+			<script src="jquery-3.1.1.min.js"></script>
+			<link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css'>
+	</head>
+	<body>
+		<div class="container">
+			<div class= "row">
+				<h1 align="center">DJ'S Page</h1>
+			</div>
+			<div class ="row">
+				<div class="col-md-4">
+					<audio controls id="maudioOne">
+  						<source type="audio/mpeg" id="sourceOne">
+					</audio>
+					<div id="playlistOne"></div>
+				</div>
+				<div class="col-md-4">
+					<audio controls id="maudioTwo">
+  						<source type="audio/mpeg" id="sourceTwo">
+					</audio>
+					<div id="playlistTwo"></div>
+				</div>
+				<div class="col-md-4">
+					<audio controls id="maudioThree">
+  						<source type="audio/mpeg" id="sourceThree">
+					</audio>
+					<div id="playlistThree"></div>
+			<script>
+			var socket = io.connect("http://192.168.11.13:3000");
+			var audioOne = document.getElementById('maudioOne');
+			var audioTwo = document.getElementById('maudioTwo');
+			var audioThree = document.getElementById('maudioThree');
+			var path1;
+			var path2;
+			var path3;
+		
+			socket.emit('room', 1);
+			socket.emit('room', 2);
+			socket.emit('room', 3);
+
+			socket.on('displayPlaylistOne', function(data) {
+				var temp = data.number;
+				for(i in data.list) {
+					$('#playlist'+temp).append("<button onclick='fun1(this.id)' id='"+data.list[i].path+"'>"+data.list[i].path+"</button><br>")
+				}
+			});
+			socket.on('displayPlaylistTwo', function(data) {
+				var temp = data.number;
+				for(i in data.list) {
+					$('#playlist'+temp).append("<button onclick='fun2(this.id)' id='"+data.list[i].path+"'>"+data.list[i].path+"</button><br>")
+				}
+			});
+			socket.on('displayPlaylistThree', function(data) {
+				var temp = data.number;
+				for(i in data.list) {
+					$('#playlist'+temp).append("<button onclick='fun3(this.id)' id='"+data.list[i].path+"'>"+data.list[i].path+"</button><br>")
+				}
+			});
+			socket.on('xx', function(channelNumber) {
+				var finalPath;
+				if(channelNumber == 1) {
+					var t = audioOne.currentTime;
+					finalPath = path1;
+				}
+				else if(channelNumber == 2) {
+					var t = audioTwo.currentTime;
+					finalPath = path2	
+				}
+				console.log("in xx");
+				socket.emit('x', {t:t, path:finalPath});
+			});
+
+
+			function fun1(path){
+				path1 = path;
+				var source = document.getElementById('sourceOne');
+				source.src = path;
+				audioOne.load();
+				audioOne.play();
+				socket.emit('sendToServerOne', path);
+			}
+			function fun2(path){
+				path2 = path;
+				console.log(path);
+				var source = document.getElementById('sourceTwo');
+				source.src = path;
+				audioTwo.load();
+				audioTwo.play();
+				socket.emit('sendToServerTwo', path);
+			}
+			function fun3(path){
+				path3 = path;
+				var source = document.getElementById('sourceThree');
+				source.src = path;
+				audioThree.load();
+				audioThree.play();
+				socket.emit('sendToServerThree', path);
+			}
+		
+		</script>
+	</body>
+</html>

@@ -1,0 +1,73 @@
+html
+  head
+    link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css')
+    link(rel='stylesheet', href='index.css')
+    script(src='socket.io.js')
+    script(src='jquery-3.1.1.min.js')
+  body
+    #az.container-fluid
+      .row
+        h1(align='center') Silent Disco
+        h1#x #{name}
+        .row
+          .col-md-4
+            button#1.btn.btn-primary.btn-lg.btn-block.c1(onclick='fun1(this.id)') 1
+          .col-md-4
+            button#2.btn.btn-primary.btn-lg.btn-block.c1(onclick='fun1(this.id)') 2
+          .col-md-4
+            button.btn.btn-primary.btn-lg.btn-block.c1 3
+        .row
+          .col-md-4
+            button.btn.btn-primary.btn-lg.btn-block.c1 4
+          .col-md-4
+            button.btn.btn-primary.btn-lg.btn-block.c1 5
+          .col-md-4
+            button.btn.btn-primary.btn-lg.btn-block.c1 6
+      #song
+        audio#audio-player(controls='controls')
+          source#mp3source(src='', type='audio/mpeg')
+    button.playButton(onclick='fun2()') play
+  script.
+    var my_css_class
+    var st_time
+    var socket = io.connect("http://192.168.11.13:3000");
+    var room=$('#x').text();
+    console.log(x);
+    function fun2() {
+    console.log("in fun2");
+    var temp = document.getElementById('audio-player').play();
+    
+    my_css_class = {visibility:'hidden'}
+    $(".playButton").css(my_css_class)
+    my_css_class = {opacity:1}
+    $("#az").css(my_css_class)
+    }
+    function fun1(channelNumber) {
+    my_css_class = { opacity:0.25}
+    $("#az").css(my_css_class)
+    my_css_class = {visibility:'visible'}
+    $(".playButton").css(my_css_class)
+    socket.emit('channel', {channelNumber:channelNumber, name:room});
+    socket.on('firstSong', function(data) {
+    console.log(data);
+    document.getElementById('mp3source').src = data.path;
+    var temp = document.getElementById('audio-player');
+    temp.load();
+    temp.play();
+    st_time = data.startTime;
+    temp.currentTime = data.startTime;
+    console.log(name);
+    })
+    socket.emit('room', room);
+    }
+    socket.on('nextSong', function(path) {
+    console.log("this is the path"+path);
+    document.getElementById('song').innerHTML = '<audio id="audio-player" controls="controls" src="' + path.path + '" type="audio/mpeg">'
+    var temp = document.getElementById('audio-player');
+    my_css_class = { opacity:0.25}
+    $("#az").css(my_css_class)
+    my_css_class = {visibility:'visible'}
+    $(".playButton").css(my_css_class)
+    temp.load();
+    temp.play();
+    })

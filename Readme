@@ -1,0 +1,5 @@
+1. Run index.js on terminal.
+2. Open browser and got to localhost:3000/channel.html (this is the dj's page. Click on play on wither or both of the audio elements.)
+3. Open localhost:3000 (this is client page).
+4. Now you can click on 1 or 2 channel(rest are yet not developed).
+
